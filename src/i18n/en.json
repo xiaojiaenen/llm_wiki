@@ -702,5 +702,28 @@
     "minutesAgo": "{{count}} min ago",
     "hoursAgo": "{{count}} h ago",
     "daysAgo": "{{count}} d ago"
+  },
+  "common": {
+    "loading": "Loading...",
+    "edit": "Edit",
+    "done": "Done",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "close": "Close",
+    "save": "Save",
+    "saved": "Saved!",
+    "saving": "Saving...",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "copyToClipboard": "Copy to clipboard",
+    "regenerate": "Regenerate",
+    "saveToWiki": "Save to wiki",
+    "resetFilters": "Reset graph filters",
+    "showAllTypes": "Show all types",
+    "toggleVisibility": "Double-click to toggle visibility",
+    "enlargeDiagram": "Enlarge diagram",
+    "scanFiles": "Scan project files for external changes",
+    "cancelAll": "Cancel all queued and in-progress tasks",
+    "ignore": "Ignore"
   }
 }

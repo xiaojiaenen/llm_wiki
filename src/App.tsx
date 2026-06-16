@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { open } from "@tauri-apps/plugin-dialog"
 import { invoke } from "@tauri-apps/api/core"
 import { disable as disableAutostart, enable as enableAutostart, isEnabled as isAutostartEnabled } from "@tauri-apps/plugin-autostart"
+import { useTranslation } from "react-i18next"
 import i18n from "@/i18n"
 import { useWikiStore } from "@/stores/wiki-store"
 import { useReviewStore } from "@/stores/review-store"
@@ -23,6 +24,7 @@ function applyDocumentZoom(level: number) {
 }
 
 function App() {
+  const { t } = useTranslation()
   const project = useWikiStore((s) => s.project)
   const setProject = useWikiStore((s) => s.setProject)
   const setFileTree = useWikiStore((s) => s.setFileTree)
@@ -512,7 +514,7 @@ function App() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center bg-background text-muted-foreground">
-        Loading...
+        {t("common.loading")}
       </div>
     )
   }

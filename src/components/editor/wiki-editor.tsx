@@ -10,6 +10,7 @@ import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react"
 import "@milkdown/theme-nord/style.css"
 import "katex/dist/katex.min.css"
 import { Pencil, Eye } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { parseFrontmatter } from "@/lib/frontmatter"
 import { FrontmatterPanel } from "@/components/editor/frontmatter-panel"
 import { WikiReader } from "@/components/editor/wiki-reader"
@@ -72,6 +73,7 @@ function wrapBareMathBlocks(text: string): string {
 }
 
 export function WikiEditor({ content, onSave, filePath }: WikiEditorProps) {
+  const { t } = useTranslation()
   // Default to read mode (ReactMarkdown render). Edit mode swaps
   // in Milkdown WYSIWYG. We default to read because:
   //   1. Milkdown's commonmark/gfm preset has no wikilink schema,
@@ -130,11 +132,11 @@ export function WikiEditor({ content, onSave, filePath }: WikiEditorProps) {
           if (mode === "edit") saveLatestNow()
           setMode((m) => (m === "read" ? "edit" : "read"))
         }}
-        title={mode === "read" ? "Edit (raw markdown)" : "Done editing"}
+        title={mode === "read" ? t("common.edit") : t("common.done")}
         className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-md border border-border/60 bg-background/90 px-2 py-1 text-xs text-muted-foreground shadow-sm hover:bg-accent hover:text-foreground"
       >
         {mode === "read" ? <Pencil className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-        {mode === "read" ? "Edit" : "Done"}
+        {mode === "read" ? t("common.edit") : t("common.done")}
       </button>
 
       {mode === "read" ? (

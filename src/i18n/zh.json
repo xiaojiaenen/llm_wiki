@@ -702,5 +702,28 @@
     "minutesAgo": "{{count}} 分钟前",
     "hoursAgo": "{{count}} 小时前",
     "daysAgo": "{{count}} 天前"
+  },
+  "common": {
+    "loading": "加载中...",
+    "edit": "编辑",
+    "done": "完成",
+    "cancel": "取消",
+    "retry": "重试",
+    "close": "关闭",
+    "save": "保存",
+    "saved": "已保存！",
+    "saving": "保存中...",
+    "copy": "复制",
+    "copied": "已复制！",
+    "copyToClipboard": "复制到剪贴板",
+    "regenerate": "重新生成",
+    "saveToWiki": "保存到 Wiki",
+    "resetFilters": "重置图谱筛选",
+    "showAllTypes": "显示所有类型",
+    "toggleVisibility": "双击切换可见性",
+    "enlargeDiagram": "放大图表",
+    "scanFiles": "扫描项目文件的外部变更",
+    "cancelAll": "取消所有排队和进行中的任务",
+    "ignore": "忽略"
   }
 }
