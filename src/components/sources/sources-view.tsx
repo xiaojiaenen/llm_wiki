@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next"
 import { normalizePath } from "@/lib/path-utils"
 import { decideDeleteClick } from "@/lib/sources-tree-delete"
 import { rescanProjectFileSync } from "@/lib/project-file-sync"
+import { naturalCompare } from "@/lib/natural-sort"
 import {
   deleteSourceFile,
   deleteSourceFolder,
@@ -19,6 +20,8 @@ import {
   importSourceFolder,
 } from "@/lib/source-lifecycle"
 import { UrlImportDialog } from "./url-import-dialog"
+import { filterRawSourceTree } from "@/lib/source-filter"
+import { refreshProjectFileTree } from "@/lib/project-file-tree-refresh"
 
 const SOURCE_TREE_INITIAL_ROWS = 160
 const SOURCE_TREE_LOAD_BATCH = 160
@@ -29,7 +32,6 @@ export function SourcesView() {
   const selectedFile = useWikiStore((s) => s.selectedFile)
   const setSelectedFile = useWikiStore((s) => s.setSelectedFile)
   const openFileInPreview = useWikiStore((s) => s.openFileInPreview)
-  const setFileTree = useWikiStore((s) => s.setFileTree)
   const llmConfig = useWikiStore((s) => s.llmConfig)
   const sourceWatchConfig = useWikiStore((s) => s.sourceWatchConfig)
   const dataVersion = useWikiStore((s) => s.dataVersion)
@@ -66,10 +68,8 @@ export function SourcesView() {
     if (!project) return
     const pp = normalizePath(project.path)
     try {
-      const tree = await listDirectory(`${pp}/raw/sources`)
-      // Filter out hidden files/dirs and cache
-      const filtered = filterTree(tree)
-      setSources(filtered)
+      const tree = await listDirectory(`${pp}/raw/sources`, true)
+      setSources(filterRawSourceTree(tree))
       setRefreshError(null)
     } catch (err) {
       setRefreshError(String(err))
@@ -189,9 +189,10 @@ export function SourcesView() {
       // Step 8: Refresh everything (UI side — must run with parent
       // context, hence kept here rather than inside the helper).
       await loadSources()
-      const tree = await listDirectory(pp)
-      setFileTree(tree)
-      useWikiStore.getState().bumpDataVersion()
+      await refreshProjectFileTree(pp, {
+        projectId: project.id,
+        bumpDataVersion: true,
+      })
       if (
         selectedFile === node.path ||
         result.deletedWikiPaths.includes(selectedFile ?? "")
@@ -224,9 +225,10 @@ export function SourcesView() {
     try {
       const result = await deleteSourceFolder(pp, folder)
       await loadSources()
-      const tree = await listDirectory(pp)
-      setFileTree(tree)
-      useWikiStore.getState().bumpDataVersion()
+      await refreshProjectFileTree(pp, {
+        projectId: project.id,
+        bumpDataVersion: true,
+      })
       if (
         selectedFile?.startsWith(folder.path + "/") ||
         result.deletedWikiPaths.includes(selectedFile ?? "")
@@ -378,18 +380,6 @@ interface SourceTreeRow {
   depth: number
 }
 
-function filterTree(nodes: FileNode[]): FileNode[] {
-  return nodes
-    .filter((n) => !n.name.startsWith("."))
-    .map((n) => {
-      if (n.is_dir && n.children) {
-        return { ...n, children: filterTree(n.children) }
-      }
-      return n
-    })
-    .filter((n) => !n.is_dir || (n.children && n.children.length > 0))
-}
-
 function countFiles(nodes: FileNode[]): number {
   let count = 0
   for (const node of nodes) {
@@ -406,7 +396,7 @@ function sortSourceNodes(nodes: readonly FileNode[]): FileNode[] {
   return [...nodes].sort((a, b) => {
     if (a.is_dir && !b.is_dir) return -1
     if (!a.is_dir && b.is_dir) return 1
-    return a.name.localeCompare(b.name)
+    return naturalCompare(a.name, b.name)
   })
 }
 

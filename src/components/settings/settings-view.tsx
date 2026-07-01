@@ -170,6 +170,7 @@ function initialDraft(
     transcriptionLanguage: transcription.language,
     apiEnabled: apiConfig.enabled,
     apiAllowUnauthenticated: apiConfig.allowUnauthenticated,
+    apiAllowLanAccess: apiConfig.allowLanAccess,
     apiMcpEnabled: apiConfig.mcpEnabled,
     apiToken: apiConfig.token,
     autostart: generalConfig.autostart,
@@ -419,6 +420,7 @@ export function SettingsView() {
     const newApiConfig = {
       enabled: draft.apiEnabled,
       allowUnauthenticated: draft.apiAllowUnauthenticated,
+      allowLanAccess: draft.apiAllowLanAccess,
       mcpEnabled: draft.apiMcpEnabled,
       token: draft.apiToken.trim(),
     }
@@ -489,9 +491,10 @@ export function SettingsView() {
       const { saveTranscriptionConfig: saveTc } = await import("@/lib/project-store")
       await saveTc(newTranscriptionConfig)
 
-      // The Rust side reads `apiConfig.{enabled,token,mcpEnabled}` from this
+      // The Rust side reads `apiConfig.{enabled,token,mcpEnabled,allowLanAccess}` from this
       // same `app-state.json` via a 5s cache, so saved changes propagate within
-      // that window without any IPC round-trip.
+      // that window without any IPC round-trip. Bind-address changes still
+      // require an app restart because the server sockets are already open.
       await saveApiConfig(newApiConfig)
       try {
         await invoke<string>("api_server_reload_config")
