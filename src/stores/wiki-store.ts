@@ -223,6 +223,14 @@ export interface MineruConfig {
   modelVersion: MineruModelVersion
 }
 
+export type WhisperModelSize = "ggml-small-q5_1.bin" | "ggml-medium-q5_0.bin" | "ggml-large-v3-turbo-q5_0.bin"
+
+export interface TranscriptionConfig {
+  enabled: boolean
+  model: WhisperModelSize
+  language: string // "auto" | "en" | "zh" | "ja" | ...
+}
+
 interface MultimodalConfig {
   enabled: boolean
   /** Reuse `llmConfig` for caption calls. When true, the fields
@@ -334,6 +342,7 @@ interface WikiState {
   scheduledImportConfig: ScheduledImportConfig
   sourceWatchConfig: SourceWatchConfig
   mineruConfig: MineruConfig
+  transcriptionConfig: TranscriptionConfig
   apiConfig: ApiConfig
   generalConfig: GeneralConfig
   dataVersion: number
@@ -358,6 +367,7 @@ interface WikiState {
   setScheduledImportConfig: (config: ScheduledImportConfig) => void
   setSourceWatchConfig: (config: SourceWatchConfig) => void
   setMineruConfig: (config: MineruConfig) => void
+  setTranscriptionConfig: (config: TranscriptionConfig) => void
   setApiConfig: (config: ApiConfig) => void
   setGeneralConfig: (config: GeneralConfig) => void
   bumpDataVersion: () => void
@@ -465,6 +475,7 @@ export const useWikiStore = create<WikiState>((set) => ({
 
   sourceWatchConfig: DEFAULT_SOURCE_WATCH_CONFIG,
   mineruConfig: { enabled: false, token: "", modelVersion: "vlm" },
+  transcriptionConfig: { enabled: false, model: "ggml-small-q5_1.bin", language: "auto" },
 
   // Default `enabled: true` preserves the pre-toggle behavior: anyone
   // who already had `LLM_WIKI_API_TOKEN` set or `apiConfig.token`
@@ -494,6 +505,7 @@ export const useWikiStore = create<WikiState>((set) => ({
   setScheduledImportConfig: (scheduledImportConfig) => set({ scheduledImportConfig }),
   setSourceWatchConfig: (sourceWatchConfig) => set({ sourceWatchConfig }),
   setMineruConfig: (mineruConfig) => set({ mineruConfig }),
+  setTranscriptionConfig: (transcriptionConfig) => set({ transcriptionConfig }),
   setApiConfig: (apiConfig) => set({ apiConfig }),
   setGeneralConfig: (generalConfig) => set({ generalConfig }),
   bumpDataVersion: () => set((state) => ({ dataVersion: state.dataVersion + 1 })),

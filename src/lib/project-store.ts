@@ -1,6 +1,6 @@
 import { load } from "@tauri-apps/plugin-store"
 import type { WikiProject } from "@/types/wiki"
-import type { ApiConfig, GeneralConfig, LlmConfig, SearchApiConfig, EmbeddingConfig, MineruConfig, MultimodalConfig, OutputLanguage, ProviderConfigs, ProxyConfig, ScheduledImportConfig, SourceWatchConfig } from "@/stores/wiki-store"
+import type { ApiConfig, GeneralConfig, LlmConfig, SearchApiConfig, EmbeddingConfig, MineruConfig, MultimodalConfig, OutputLanguage, ProviderConfigs, ProxyConfig, ScheduledImportConfig, SourceWatchConfig, TranscriptionConfig } from "@/stores/wiki-store"
 import { normalizeSourceWatchConfig } from "@/lib/source-watch-config"
 import { normalizePath } from "@/lib/path-utils"
 import { DEFAULT_ZOOM_LEVEL, clampZoomLevel } from "@/stores/zoom-store"
@@ -141,6 +141,29 @@ export async function loadMineruConfig(): Promise<MineruConfig | null> {
   const store = await getStore()
   const config = await store.get<MineruConfig>(MINERU_KEY)
   return config ? normalizeMineruConfig(config) : null
+}
+
+const TRANSCRIPTION_KEY = "transcriptionConfig"
+
+const VALID_WHISPER_MODELS = ["ggml-small-q5_1.bin", "ggml-medium-q5_0.bin", "ggml-large-v3-turbo-q5_0.bin"]
+
+function normalizeTranscriptionConfig(config: TranscriptionConfig): TranscriptionConfig {
+  return {
+    enabled: config.enabled === true,
+    model: VALID_WHISPER_MODELS.includes(config.model) ? config.model : "ggml-small-q5_1.bin",
+    language: typeof config.language === "string" ? config.language : "auto",
+  }
+}
+
+export async function saveTranscriptionConfig(config: TranscriptionConfig): Promise<void> {
+  const store = await getStore()
+  await store.set(TRANSCRIPTION_KEY, normalizeTranscriptionConfig(config))
+}
+
+export async function loadTranscriptionConfig(): Promise<TranscriptionConfig | null> {
+  const store = await getStore()
+  const config = await store.get<TranscriptionConfig>(TRANSCRIPTION_KEY)
+  return config ? normalizeTranscriptionConfig(config) : null
 }
 
 // IMPORTANT: Keep this key in sync with the Rust setup hook

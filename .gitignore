@@ -13,6 +13,9 @@ dist-rc/
 # Rust build artifacts
 src-tauri/target/
 
+# Bundled sidecar binaries (yt-dlp etc.) — downloaded at build time, not committed
+src-tauri/binaries/
+
 # Tauri generated files
 src-tauri/gen/
 

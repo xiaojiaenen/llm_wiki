@@ -62,6 +62,14 @@ sha2 = "0.10"
 md-5 = "0.10"
 notify = "8"
 walkdir = "2"
+# Video transcription: whisper-rs (Rust bindings to whisper.cpp, no Python)
+whisper-rs = { version = "0.16", features = ["metal"] }
+# Audio extraction from video containers (MP4, WebM, MKV) and audio formats
+symphonia = { version = "0.6", features = ["isomp4", "aac", "mkv", "mp3", "pcm", "vorbis", "flac"] }
+# Resampling audio to 16kHz mono for whisper
+rubato = "0.16"
+# Shell plugin for yt-dlp sidecar execution
+tauri-plugin-shell = "2"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }

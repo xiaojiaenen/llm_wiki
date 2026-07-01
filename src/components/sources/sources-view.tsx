@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { open } from "@tauri-apps/plugin-dialog"
-import { Plus, FileText, RefreshCw, BookOpen, Trash2, Folder, ChevronRight, ChevronDown } from "lucide-react"
+import { Plus, FileText, RefreshCw, BookOpen, Trash2, Folder, ChevronRight, ChevronDown, Link } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -18,6 +18,7 @@ import {
   importSourceFiles,
   importSourceFolder,
 } from "@/lib/source-lifecycle"
+import { UrlImportDialog } from "./url-import-dialog"
 
 const SOURCE_TREE_INITIAL_ROWS = 160
 const SOURCE_TREE_LOAD_BATCH = 160
@@ -33,6 +34,7 @@ export function SourcesView() {
   const sourceWatchConfig = useWikiStore((s) => s.sourceWatchConfig)
   const dataVersion = useWikiStore((s) => s.dataVersion)
   const [sources, setSources] = useState<FileNode[]>([])
+  const [urlImportOpen, setUrlImportOpen] = useState(false)
   const [importing, setImporting] = useState(false)
   const [ingestingPath, setIngestingPath] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
@@ -288,6 +290,10 @@ export function SourcesView() {
             <Plus className="mr-1 h-4 w-4" />
             {t("sources.importFolder", "Folder")}
           </Button>
+          <Button size="sm" variant="outline" onClick={() => setUrlImportOpen(true)}>
+            <Link className="mr-1 h-4 w-4" />
+            {t("sources.importUrl", { defaultValue: "URL" })}
+          </Button>
         </div>
       </div>
 
@@ -354,6 +360,15 @@ export function SourcesView() {
         </Tooltip>
       </div>
       </div>
+      <UrlImportDialog
+        open={urlImportOpen}
+        onClose={() => setUrlImportOpen(false)}
+        outputDir={project ? `${project.path}/raw/sources` : ""}
+        onImported={() => {
+          setUrlImportOpen(false)
+          handleRefreshSources()
+        }}
+      />
     </TooltipProvider>
   )
 }

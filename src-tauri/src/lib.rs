@@ -149,6 +149,7 @@ pub fn run() {
         // Ark's api/coding/v3, etc.) still work. Requests leave the app
         // from Rust, never the webview.
         .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             // Let the PDF extractor find the bundled pdfium dynamic
             // library via Tauri's platform-correct resource path.
@@ -180,6 +181,7 @@ pub fn run() {
             app.manage(commands::claude_cli::ClaudeCliState::default());
             app.manage(commands::codex_cli::CodexCliState::default());
             app.manage(commands::file_sync::FileSyncState::default());
+            app.manage(commands::transcribe::TranscribeState::default());
             app.manage(CloseBehaviorState(Mutex::new("minimize".to_string())));
             app.manage(TrayAvailabilityState(Mutex::new(false)));
             // Start the API before optional desktop integrations so the
@@ -255,6 +257,14 @@ pub fn run() {
             commands::file_sync::get_file_change_queue,
             commands::file_sync::retry_file_change_task,
             commands::file_sync::ignore_file_change_task,
+            commands::transcribe::transcribe_file,
+            commands::transcribe::transcribe_url,
+            commands::transcribe::download_whisper_model,
+            commands::transcribe::list_whisper_models,
+            commands::transcribe::delete_whisper_model,
+            commands::transcribe::cancel_transcribe,
+            commands::transcribe::scrape_url,
+            commands::transcribe::detect_ytdlp,
             set_proxy_env,
             set_close_behavior,
         ])

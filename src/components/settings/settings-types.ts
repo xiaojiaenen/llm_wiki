@@ -1,5 +1,5 @@
 import type { CustomApiMode } from "./llm-presets"
-import type { AzureModelFamily, CloseBehavior, MineruModelVersion, ReasoningConfig, SourceWatchConfig } from "@/stores/wiki-store"
+import type { AzureModelFamily, CloseBehavior, MineruModelVersion, ReasoningConfig, SourceWatchConfig, WhisperModelSize } from "@/stores/wiki-store"
 
 /**
  * Shape of the draft state each section reads from and writes into.
@@ -80,6 +80,11 @@ export interface SettingsDraft {
   mineruEnabled: boolean
   mineruToken: string
   mineruModelVersion: MineruModelVersion
+
+  // Video transcription
+  transcriptionEnabled: boolean
+  transcriptionModel: WhisperModelSize
+  transcriptionLanguage: string
 
   // Local HTTP API server
   apiEnabled: boolean

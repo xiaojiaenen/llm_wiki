@@ -245,6 +245,11 @@ function App() {
         if (savedMineruConfig) {
           useWikiStore.getState().setMineruConfig(savedMineruConfig)
         }
+        const { loadTranscriptionConfig } = await import("@/lib/project-store")
+        const savedTranscription = await loadTranscriptionConfig()
+        if (savedTranscription) {
+          useWikiStore.getState().setTranscriptionConfig(savedTranscription)
+        }
         const savedProxy = await loadProxyConfig()
         if (savedProxy) {
           useWikiStore.getState().setProxyConfig(savedProxy)

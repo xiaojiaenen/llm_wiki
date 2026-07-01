@@ -101,6 +101,7 @@
     "importHint": "Import documents to start building your wiki",
     "importFiles": "Import Files",
     "importFolder": "Folder",
+    "importUrl": "URL",
     "importSourceFiles": "Import Source Files",
     "importSourceFolder": "Import Source Folder",
     "refresh": "Refresh",
@@ -120,6 +121,22 @@
     "loadingMore": "Loading more sources...",
     "sourceCount": "{{count}} source",
     "sourceCount_plural": "{{count}} sources"
+  },
+  "urlImport": {
+    "title": "Import from URL",
+    "detectedVideo": "Video detected — will download and transcribe audio",
+    "detectedWeb": "Web article detected — will extract content",
+    "transcriptionModel": "Transcription Model",
+    "transcribe": "Transcribe",
+    "import": "Import",
+    "scraping": "Fetching article...",
+    "success": "Import complete!",
+    "error": "Import failed",
+    "bilibiliLoginTitle": "BiliBili Login Required",
+    "bilibiliLoginDesc": "BiliBili requires login to download videos. Please log in to BiliBili in Chrome browser first, then retry.",
+    "openBilibili": "Open BiliBili Login",
+    "loginRequired": "Login Required",
+    "loginRequiredDesc": "This website requires login to download content. Please log in to the website in Chrome browser first, then retry."
   },
   "chat": {
     "placeholder": "Ask about your wiki...",
@@ -252,6 +269,7 @@
       "sourceWatch": "Source Watch",
       "scheduledImport": "Scheduled Import",
       "mineru": "MinerU PDF",
+      "transcription": "Video Transcription",
       "apiServer": "API + MCP",
       "output": "Output",
       "interface": "Interface",
@@ -654,6 +672,23 @@
         "testing": "Testing...",
         "testSuccess": "Connection successful",
         "testFailed": "Test failed"
+      },
+      "transcription": {
+        "title": "Video Transcription",
+        "description": "Transcribe video and audio files to text using local Whisper models. No internet required for transcription.",
+        "enabled": "Enable Transcription",
+        "model": "Model",
+        "modelHint": "Small is fast and good for most uses. Medium is more accurate. Large v3 Turbo offers the best quality.",
+        "language": "Language",
+        "languageHint": "Auto-detect works well for most languages. Specify a language for better accuracy.",
+        "downloadedModels": "Downloaded Models",
+        "download": "Download",
+        "downloading": "Downloading...",
+        "checkYtdlp": "Refresh",
+        "ytdlpInstalled": "yt-dlp is installed and ready for video downloads.",
+        "ytdlpNotInstalled": "yt-dlp is required to download videos from URLs (YouTube, Bilibili, etc.)",
+        "or": "or",
+        "installGuide": "Installation Guide"
       }
     }
   },

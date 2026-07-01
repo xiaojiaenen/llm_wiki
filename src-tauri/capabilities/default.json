@@ -11,6 +11,7 @@
     "opener:default",
     "dialog:default",
     "store:default",
+    "shell:default",
     {
       "identifier": "http:default",
       "allow": [

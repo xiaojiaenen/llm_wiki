@@ -15,6 +15,7 @@ import {
   Server,
   Settings,
   FileText,
+  Video,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { invoke } from "@tauri-apps/api/core"
@@ -39,6 +40,7 @@ import { NetworkSection } from "./sections/network-section"
 import { ScheduledImportSection } from "./sections/scheduled-import-section"
 import { SourceWatchSection } from "./sections/source-watch-section"
 import { MineruSection } from "./sections/mineru-section"
+import { TranscriptionSection } from "./sections/transcription-section"
 import { ApiServerSection } from "./sections/api-server-section"
 import { GeneralSection } from "./sections/general-section"
 import { ChangelogSection } from "./sections/changelog-section"
@@ -55,6 +57,7 @@ type CategoryId =
   | "source-watch"
   | "scheduled-import"
   | "mineru"
+  | "transcription"
   | "api-server"
   | "output"
   | "interface"
@@ -81,6 +84,7 @@ const CATEGORIES: Category[] = [
   { id: "source-watch", labelKey: "settings.categories.sourceWatch", icon: FolderSync },
   { id: "scheduled-import", labelKey: "settings.categories.scheduledImport", icon: Clock },
   { id: "mineru", labelKey: "settings.categories.mineru", icon: FileText },
+  { id: "transcription", labelKey: "settings.categories.transcription", icon: Video },
   { id: "api-server", labelKey: "settings.categories.apiServer", icon: Server },
   { id: "output", labelKey: "settings.categories.output", icon: Languages },
   { id: "interface", labelKey: "settings.categories.interface", icon: Palette },
@@ -98,6 +102,7 @@ function initialDraft(
   scheduledImport: ReturnType<typeof useWikiStore.getState>["scheduledImportConfig"],
   sourceWatch: ReturnType<typeof useWikiStore.getState>["sourceWatchConfig"],
   mineru: ReturnType<typeof useWikiStore.getState>["mineruConfig"],
+  transcription: ReturnType<typeof useWikiStore.getState>["transcriptionConfig"],
   apiConfig: ReturnType<typeof useWikiStore.getState>["apiConfig"],
   generalConfig: ReturnType<typeof useWikiStore.getState>["generalConfig"],
   maxHistoryMessages: number,
@@ -160,6 +165,9 @@ function initialDraft(
     mineruEnabled: mineru.enabled,
     mineruToken: mineru.token,
     mineruModelVersion: mineru.modelVersion,
+    transcriptionEnabled: transcription.enabled,
+    transcriptionModel: transcription.model,
+    transcriptionLanguage: transcription.language,
     apiEnabled: apiConfig.enabled,
     apiAllowUnauthenticated: apiConfig.allowUnauthenticated,
     apiMcpEnabled: apiConfig.mcpEnabled,
@@ -191,6 +199,8 @@ export function SettingsView() {
   const setSourceWatchConfig = useWikiStore((s) => s.setSourceWatchConfig)
   const mineruConfig = useWikiStore((s) => s.mineruConfig)
   const setMineruConfig = useWikiStore((s) => s.setMineruConfig)
+  const transcriptionConfig = useWikiStore((s) => s.transcriptionConfig)
+  const setTranscriptionConfig = useWikiStore((s) => s.setTranscriptionConfig)
   const apiConfig = useWikiStore((s) => s.apiConfig)
   const setApiConfig = useWikiStore((s) => s.setApiConfig)
   const generalConfig = useWikiStore((s) => s.generalConfig)
@@ -221,6 +231,7 @@ export function SettingsView() {
       scheduledImportConfig,
       sourceWatchConfig,
       mineruConfig,
+      transcriptionConfig,
       apiConfig,
       generalConfig,
       maxHistoryMessages,
@@ -278,6 +289,7 @@ export function SettingsView() {
         scheduledImportConfig,
         sourceWatchConfig,
         mineruConfig,
+        transcriptionConfig,
         apiConfig,
         generalConfig,
         maxHistoryMessages,
@@ -296,6 +308,7 @@ export function SettingsView() {
     scheduledImportConfig,
     sourceWatchConfig,
     mineruConfig,
+    transcriptionConfig,
     apiConfig,
     generalConfig,
     maxHistoryMessages,
@@ -329,6 +342,7 @@ export function SettingsView() {
       saveSourceWatchConfig,
       saveMineruConfig,
       loadMineruConfig,
+      loadTranscriptionConfig,
       saveApiConfig,
       loadApiConfig,
       saveGeneralConfig,
@@ -397,6 +411,11 @@ export function SettingsView() {
       token: draft.mineruToken.trim(),
       modelVersion: draft.mineruModelVersion,
     }
+    const newTranscriptionConfig = {
+      enabled: draft.transcriptionEnabled,
+      model: draft.transcriptionModel,
+      language: draft.transcriptionLanguage,
+    }
     const newApiConfig = {
       enabled: draft.apiEnabled,
       allowUnauthenticated: draft.apiAllowUnauthenticated,
@@ -421,6 +440,7 @@ export function SettingsView() {
     setScheduledImportConfig(newScheduledImport)
     setMaxHistoryMessages(draft.maxHistoryMessages)
     setMineruConfig(newMineruConfig)
+    setTranscriptionConfig(newTranscriptionConfig)
     setApiConfig(newApiConfig)
     setGeneralConfig(newGeneralConfig)
 
@@ -466,6 +486,8 @@ export function SettingsView() {
       }
 
       await saveMineruConfig(newMineruConfig)
+      const { saveTranscriptionConfig: saveTc } = await import("@/lib/project-store")
+      await saveTc(newTranscriptionConfig)
 
       // The Rust side reads `apiConfig.{enabled,token,mcpEnabled}` from this
       // same `app-state.json` via a 5s cache, so saved changes propagate within
@@ -527,6 +549,7 @@ export function SettingsView() {
           persistedSourceWatch,
           persistedScheduledImport,
           persistedMineru,
+          persistedTranscription,
           persistedApi,
           persistedGeneral,
           persistedZoom,
@@ -539,6 +562,7 @@ export function SettingsView() {
           loadSourceWatchConfig(project?.id),
           project ? loadScheduledImportConfig(project.path) : Promise.resolve(null),
           loadMineruConfig(),
+          loadTranscriptionConfig(),
           loadApiConfig(),
           loadGeneralConfig(),
           loadZoomLevel(),
@@ -552,6 +576,7 @@ export function SettingsView() {
         setScheduledImportConfig(resultValue(persistedScheduledImport, null) ?? scheduledImportConfig)
         setMaxHistoryMessages(maxHistoryMessages)
         setMineruConfig(resultValue(persistedMineru, null) ?? mineruConfig)
+        setTranscriptionConfig(resultValue(persistedTranscription, null) ?? transcriptionConfig)
         setApiConfig(resultValue(persistedApi, null) ?? apiConfig)
         setGeneralConfig(resultValue(persistedGeneral, generalConfig))
         useZoomStore.getState().setLevel(resultValue(persistedZoom, useZoomStore.getState().level))
@@ -611,6 +636,8 @@ export function SettingsView() {
         return <ScheduledImportSection draft={draft} setDraft={setDraft} />
       case "mineru":
         return <MineruSection draft={draft} setDraft={setDraft} />
+      case "transcription":
+        return <TranscriptionSection draft={draft} setDraft={setDraft} />
       case "api-server":
         return <ApiServerSection draft={draft} setDraft={setDraft} />
       case "output":
