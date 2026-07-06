@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
 import { useTranslation } from "react-i18next"
-import { invoke } from "@tauri-apps/api/core"
 import { listen } from "@tauri-apps/api/event"
 import { openUrl } from "@tauri-apps/plugin-opener"
 import { Button } from "@/components/ui/button"
@@ -101,7 +100,7 @@ origin: web-import
 ${result.markdown}`
 
         const filePath = `${outputDir}/${slug}-${now}.md`
-        await invoke("write_file", { path: filePath, content })
+        await writeFile(filePath, content)
         setResultPath(filePath)
       }
 
